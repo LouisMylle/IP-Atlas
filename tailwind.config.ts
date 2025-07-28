@@ -61,7 +61,31 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				'ip-available': {
+					DEFAULT: 'hsl(var(--ip-available))',
+					foreground: 'hsl(var(--ip-available-foreground))'
+				},
+				'ip-used': {
+					DEFAULT: 'hsl(var(--ip-used))',
+					foreground: 'hsl(var(--ip-used-foreground))'
+				},
+				'ip-reserved': {
+					DEFAULT: 'hsl(var(--ip-reserved))',
+					foreground: 'hsl(var(--ip-reserved-foreground))'
+				},
+				'ip-offline': {
+					DEFAULT: 'hsl(var(--ip-offline))',
+					foreground: 'hsl(var(--ip-offline-foreground))'
 				}
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-subtle': 'var(--gradient-subtle)'
+			},
+			boxShadow: {
+				'technical': 'var(--shadow-technical)',
+				'card': 'var(--shadow-card)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
