@@ -7,8 +7,9 @@ import { IPAddressGrid } from "@/components/IPAddressGrid";
 import { AddRangeDialog } from "@/components/AddRangeDialog";
 import { IPRange, IPAddress, IPRangeWithAddresses } from "@/types/ip-management";
 import { createIPAddressesForRange } from "@/utils/ip-utils";
-import { ArrowLeft, Network, Server, Activity } from "lucide-react";
+import { ArrowLeft, Network, Server, Activity, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Sample data
 const generateSampleData = (): IPRangeWithAddresses[] => {
@@ -234,6 +235,22 @@ const Index = () => {
     });
   };
 
+  const handleRemoveRange = (range: IPRangeWithAddresses) => {
+    setRanges(prev => prev.filter(r => r.id !== range.id));
+    setHiddenRanges(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(range.id);
+      return newSet;
+    });
+    toast({
+      title: "Range Removed",
+      description: `Successfully removed ${range.name} and all its IP addresses.`,
+    });
+  };
+
+  const visibleRanges = ranges.filter(range => !hiddenRanges.has(range.id));
+  const hiddenRangesList = ranges.filter(range => hiddenRanges.has(range.id));
+
   const totalIPs = ranges.reduce((sum, range) => sum + range.totalIps, 0);
   const totalUsed = ranges.reduce((sum, range) => sum + range.usedIps, 0);
   const totalAvailable = ranges.reduce((sum, range) => sum + range.availableIps, 0);
@@ -327,18 +344,68 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* IP Ranges List - One per row */}
-        <div className="space-y-4">
-          {ranges.map((range) => (
-            <IPRangeCard
-              key={range.id}
-              range={range}
-              onViewDetails={setSelectedRange}
-              onToggleVisibility={handleToggleVisibility}
-              isHidden={hiddenRanges.has(range.id)}
-            />
-          ))}
-        </div>
+        {/* IP Ranges Tabs */}
+        <Tabs defaultValue="visible" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="visible">
+              Visible Ranges ({visibleRanges.length})
+            </TabsTrigger>
+            <TabsTrigger value="hidden">
+              Hidden Ranges ({hiddenRangesList.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="visible" className="space-y-4">
+            {visibleRanges.length > 0 ? (
+              visibleRanges.map((range) => (
+                <IPRangeCard
+                  key={range.id}
+                  range={range}
+                  onViewDetails={setSelectedRange}
+                  onToggleVisibility={handleToggleVisibility}
+                  onRemove={handleRemoveRange}
+                  isHidden={false}
+                />
+              ))
+            ) : (
+              <Card className="shadow-card">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Network className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Visible IP Ranges</h3>
+                  <p className="text-muted-foreground text-center mb-4">
+                    All ranges are hidden or no ranges exist. Add a new range or show hidden ranges.
+                  </p>
+                  <AddRangeDialog onAddRange={handleAddRange} />
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="hidden" className="space-y-4">
+            {hiddenRangesList.length > 0 ? (
+              hiddenRangesList.map((range) => (
+                <IPRangeCard
+                  key={range.id}
+                  range={range}
+                  onViewDetails={setSelectedRange}
+                  onToggleVisibility={handleToggleVisibility}
+                  onRemove={handleRemoveRange}
+                  isHidden={true}
+                />
+              ))
+            ) : (
+              <Card className="shadow-card">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <EyeOff className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Hidden Ranges</h3>
+                  <p className="text-muted-foreground text-center">
+                    No ranges are currently hidden.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
 
         {ranges.length === 0 && (
           <Card className="shadow-card">

@@ -1,17 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Network, Eye, EyeOff, Wifi } from "lucide-react";
+import { Network, Eye, EyeOff, Wifi, Trash2 } from "lucide-react";
 import { IPRangeWithAddresses } from "@/types/ip-management";
 
 interface IPRangeCardProps {
   range: IPRangeWithAddresses;
   onViewDetails: (range: IPRangeWithAddresses) => void;
   onToggleVisibility: (range: IPRangeWithAddresses) => void;
+  onRemove: (range: IPRangeWithAddresses) => void;
   isHidden?: boolean;
 }
 
-export const IPRangeCard = ({ range, onViewDetails, onToggleVisibility, isHidden = false }: IPRangeCardProps) => {
+export const IPRangeCard = ({ range, onViewDetails, onToggleVisibility, onRemove, isHidden = false }: IPRangeCardProps) => {
   const utilizationPercentage = Math.round((range.usedIps / range.totalIps) * 100);
   
   const getUtilizationColor = (percentage: number) => {
@@ -99,6 +100,14 @@ export const IPRangeCard = ({ range, onViewDetails, onToggleVisibility, isHidden
             ) : (
               <EyeOff className="h-4 w-4" />
             )}
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onRemove(range)}
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </CardContent>
