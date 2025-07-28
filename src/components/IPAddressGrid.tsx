@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -20,18 +21,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IPAddress, IPRangeWithAddresses } from "@/types/ip-management";
-import { Edit, Filter, Search } from "lucide-react";
+import { BulkActionsToolbar } from "@/components/BulkActionsToolbar";
+import { Edit, Filter, Search, CheckSquare, Square } from "lucide-react";
 
 interface IPAddressGridProps {
   range: IPRangeWithAddresses;
   onUpdateIP: (ip: IPAddress) => void;
+  onBulkUpdateIPs: (ipIds: string[], updates: Partial<IPAddress>) => void;
 }
 
-export const IPAddressGrid = ({ range, onUpdateIP }: IPAddressGridProps) => {
+export const IPAddressGrid = ({ range, onUpdateIP, onBulkUpdateIPs }: IPAddressGridProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedIP, setSelectedIP] = useState<IPAddress | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedIPs, setSelectedIPs] = useState<string[]>([]);
 
   const filteredAddresses = range.addresses.filter(ip => {
     const matchesSearch = ip.ip.includes(searchTerm) || 
@@ -60,8 +64,40 @@ export const IPAddressGrid = ({ range, onUpdateIP }: IPAddressGridProps) => {
     setSelectedIP(null);
   };
 
+  const handleIPSelection = (ipId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIPs(prev => [...prev, ipId]);
+    } else {
+      setSelectedIPs(prev => prev.filter(id => id !== ipId));
+    }
+  };
+
+  const handleSelectAll = () => {
+    setSelectedIPs(filteredAddresses.map(ip => ip.id));
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedIPs([]);
+  };
+
+  const handleBulkUpdate = (updates: Partial<IPAddress>) => {
+    onBulkUpdateIPs(selectedIPs, updates);
+    setSelectedIPs([]);
+  };
+
+  const selectedIPObjects = filteredAddresses.filter(ip => selectedIPs.includes(ip.id));
+
   return (
     <div className="space-y-4">
+      <BulkActionsToolbar
+        selectedIPs={selectedIPObjects}
+        onBulkUpdate={handleBulkUpdate}
+        onBulkClear={handleDeselectAll}
+        onSelectAll={handleSelectAll}
+        onDeselectAll={handleDeselectAll}
+        totalIPs={filteredAddresses.length}
+      />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -104,10 +140,17 @@ export const IPAddressGrid = ({ range, onUpdateIP }: IPAddressGridProps) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredAddresses.map((ip) => (
-              <Card key={ip.id} className="hover:shadow-sm transition-shadow cursor-pointer">
+              <Card key={ip.id} className="hover:shadow-sm transition-shadow relative">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-sm font-medium">{ip.ip}</span>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={selectedIPs.includes(ip.id)}
+                        onCheckedChange={(checked) => handleIPSelection(ip.id, !!checked)}
+                        className="h-4 w-4"
+                      />
+                      <span className="font-mono text-sm font-medium">{ip.ip}</span>
+                    </div>
                     <Dialog open={isEditDialogOpen && selectedIP?.id === ip.id} onOpenChange={(open) => {
                       setIsEditDialogOpen(open);
                       if (!open) setSelectedIP(null);

@@ -150,6 +150,69 @@ const Index = () => {
     });
   };
 
+  const handleBulkUpdateIPs = (ipIds: string[], updates: Partial<IPAddress>) => {
+    setRanges(prev => prev.map(range => {
+      const hasUpdates = range.addresses.some(ip => ipIds.includes(ip.id));
+      if (!hasUpdates) return range;
+      
+      const updatedAddresses = range.addresses.map(ip => {
+        if (!ipIds.includes(ip.id)) return ip;
+        
+        const updatedIP = { ...ip, ...updates };
+        // Only update fields that are provided in updates
+        Object.keys(updates).forEach(key => {
+          if (updates[key as keyof IPAddress] !== undefined) {
+            (updatedIP as any)[key] = updates[key as keyof IPAddress];
+          }
+        });
+        
+        return updatedIP;
+      });
+      
+      const usedIps = updatedAddresses.filter(ip => ip.status === 'used').length;
+      const availableIps = updatedAddresses.filter(ip => ip.status === 'available').length;
+      
+      return {
+        ...range,
+        addresses: updatedAddresses,
+        usedIps,
+        availableIps,
+      };
+    }));
+
+    // Update selected range if it's the one being modified
+    if (selectedRange) {
+      const updatedRange = ranges.find(r => r.id === selectedRange.id);
+      if (updatedRange) {
+        const hasUpdates = updatedRange.addresses.some(ip => ipIds.includes(ip.id));
+        if (hasUpdates) {
+          const updatedAddresses = selectedRange.addresses.map(ip => {
+            if (!ipIds.includes(ip.id)) return ip;
+            
+            const updatedIP = { ...ip, ...updates };
+            Object.keys(updates).forEach(key => {
+              if (updates[key as keyof IPAddress] !== undefined) {
+                (updatedIP as any)[key] = updates[key as keyof IPAddress];
+              }
+            });
+            
+            return updatedIP;
+          });
+          
+          setSelectedRange({
+            ...selectedRange,
+            addresses: updatedAddresses,
+          });
+        }
+      }
+    }
+
+    toast({
+      title: "Bulk Update Complete",
+      description: `Successfully updated ${ipIds.length} IP address${ipIds.length !== 1 ? 'es' : ''}`,
+    });
+  };
+
   const totalIPs = ranges.reduce((sum, range) => sum + range.totalIps, 0);
   const totalUsed = ranges.reduce((sum, range) => sum + range.usedIps, 0);
   const totalAvailable = ranges.reduce((sum, range) => sum + range.availableIps, 0);
@@ -179,6 +242,7 @@ const Index = () => {
           <IPAddressGrid 
             range={selectedRange} 
             onUpdateIP={handleUpdateIP}
+            onBulkUpdateIPs={handleBulkUpdateIPs}
           />
         </div>
       </div>
