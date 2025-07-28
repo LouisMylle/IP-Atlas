@@ -81,6 +81,7 @@ const generateSampleData = (): IPRangeWithAddresses[] => {
 const Index = () => {
   const [ranges, setRanges] = useState<IPRangeWithAddresses[]>([]);
   const [selectedRange, setSelectedRange] = useState<IPRangeWithAddresses | null>(null);
+  const [hiddenRanges, setHiddenRanges] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -213,6 +214,26 @@ const Index = () => {
     });
   };
 
+  const handleToggleVisibility = (range: IPRangeWithAddresses) => {
+    setHiddenRanges(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(range.id)) {
+        newSet.delete(range.id);
+        toast({
+          title: "Range Shown",
+          description: `${range.name} is now visible.`,
+        });
+      } else {
+        newSet.add(range.id);
+        toast({
+          title: "Range Hidden",
+          description: `${range.name} is now hidden.`,
+        });
+      }
+      return newSet;
+    });
+  };
+
   const totalIPs = ranges.reduce((sum, range) => sum + range.totalIps, 0);
   const totalUsed = ranges.reduce((sum, range) => sum + range.usedIps, 0);
   const totalAvailable = ranges.reduce((sum, range) => sum + range.availableIps, 0);
@@ -306,19 +327,15 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* IP Ranges Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* IP Ranges List - One per row */}
+        <div className="space-y-4">
           {ranges.map((range) => (
             <IPRangeCard
               key={range.id}
               range={range}
               onViewDetails={setSelectedRange}
-              onEdit={(range) => {
-                toast({
-                  title: "Edit Range",
-                  description: "Range editing will be implemented in the next version.",
-                });
-              }}
+              onToggleVisibility={handleToggleVisibility}
+              isHidden={hiddenRanges.has(range.id)}
             />
           ))}
         </div>
