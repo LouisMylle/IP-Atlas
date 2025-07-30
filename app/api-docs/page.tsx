@@ -14,13 +14,15 @@ const APIDocsPage = () => {
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
 
   const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedCode(id)
-    toast({
-      title: "Copied to clipboard",
-      description: "Code has been copied to your clipboard.",
-    })
-    setTimeout(() => setCopiedCode(null), 2000)
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text)
+      setCopiedCode(id)
+      toast({
+        title: "Copied to clipboard",
+        description: "Code has been copied to your clipboard.",
+      })
+      setTimeout(() => setCopiedCode(null), 2000)
+    }
   }
 
   const CodeBlock = ({ code, language, id }: { code: string; language: string; id: string }) => (

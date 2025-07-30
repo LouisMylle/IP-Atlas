@@ -108,7 +108,7 @@ const SettingsPage = () => {
   }
 
   const handleCopyApiKey = () => {
-    if (apiKey) {
+    if (apiKey && typeof window !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(apiKey)
       toast({
         title: "Copied!",
