@@ -235,19 +235,22 @@ const Dashboard = () => {
   const handleToggleVisibility = (range: IPRangeWithAddresses) => {
     setHiddenRanges(prev => {
       const newSet = new Set(prev)
-      if (newSet.has(range.id)) {
+      const wasHidden = newSet.has(range.id)
+      
+      if (wasHidden) {
         newSet.delete(range.id)
-        toast({
-          title: "Range Shown",
-          description: `${range.name} is now visible.`,
-        })
       } else {
         newSet.add(range.id)
-        toast({
-          title: "Range Hidden",
-          description: `${range.name} is now hidden.`,
-        })
       }
+      
+      // Schedule toast for next tick to avoid setState during render
+      setTimeout(() => {
+        toast({
+          title: wasHidden ? "Range Shown" : "Range Hidden",
+          description: `${range.name} is now ${wasHidden ? 'visible' : 'hidden'}.`,
+        })
+      }, 0)
+      
       return newSet
     })
   }

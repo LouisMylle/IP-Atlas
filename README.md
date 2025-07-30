@@ -2,6 +2,8 @@
 
 A modern Next.js application for managing network IP ranges and allocations.
 
+![IP Atlas Demo](https://secureservers.be/optimize-stor/ipatlas/recording.gif)
+
 ## Table of Contents
 
 - [Features](#features)

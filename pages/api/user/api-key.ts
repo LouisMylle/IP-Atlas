@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     try {
       const userData = await prisma.user.findUnique({
-        where: { id: user.id },
+        where: { email: user.email || '' },
         select: { apiKey: true },
       })
 
@@ -25,29 +25,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const newApiKey = generateApiKey()
       
-      // First check if user exists, if not create it
-      const existingUser = await prisma.user.findUnique({
-        where: { id: user.id },
+      // Use upsert to handle both create and update cases
+      await prisma.user.upsert({
+        where: { email: user.email || '' },
+        update: { 
+          apiKey: newApiKey,
+          name: user.name || undefined, // Only update if provided
+        },
+        create: {
+          email: user.email || '',
+          name: user.name || '',
+          password: '', // Required field, but empty for OAuth users
+          apiKey: newApiKey,
+        },
       })
-      
-      if (!existingUser) {
-        // Create user if it doesn't exist
-        await prisma.user.create({
-          data: {
-            id: user.id,
-            email: user.email || '',
-            name: user.name || '',
-            password: '', // Required field, but empty for OAuth users
-            apiKey: newApiKey,
-          },
-        })
-      } else {
-        // Update existing user
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { apiKey: newApiKey },
-        })
-      }
 
       res.status(201).json({ apiKey: newApiKey })
     } catch (error) {
@@ -58,12 +49,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       // Check if user exists first
       const existingUser = await prisma.user.findUnique({
-        where: { id: user.id },
+        where: { email: user.email || '' },
       })
       
       if (existingUser) {
         await prisma.user.update({
-          where: { id: user.id },
+          where: { email: user.email || '' },
           data: { apiKey: null },
         })
       }
