@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("user") // admin, user
+  apiKey    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model IPRange {
+  id            String      @id @default(cuid())
+  name          String
+  network       String
+  cidr          Int
+  vlan          Int?
+  description   String?
+  gateway       String?
+  dnsServers    String? // JSON string array
+  includeInStats Boolean    @default(true) // Include in global statistics
+  label         String?     @default("public") // public, private, or custom
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  addresses     IPAddress[]
+
+  @@map("ip_ranges")
+}
+
+model IPAddress {
+  id          String   @id @default(cuid())
+  rangeId     String
+  ip          String
+  status      String   @default("available") // available, used, reserved, offline
+  hostname    String?
+  description String?
+  macAddress  String?
+  assignedTo  String?
+  lastSeen    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  range IPRange @relation(fields: [rangeId], references: [id], onDelete: Cascade)
+
+  @@unique([rangeId, ip])
+  @@map("ip_addresses")
+}

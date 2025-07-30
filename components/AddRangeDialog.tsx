@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Plus } from "lucide-react";
 import { IPRange } from "@/types/ip-management";
 
@@ -27,6 +30,7 @@ export const AddRangeDialog = ({ onAddRange }: AddRangeDialogProps) => {
     description: '',
     gateway: '',
     dnsServers: '',
+    includeInStats: true,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,6 +49,7 @@ export const AddRangeDialog = ({ onAddRange }: AddRangeDialogProps) => {
       description: formData.description || undefined,
       gateway: formData.gateway || undefined,
       dnsServers: dnsArray.length > 0 ? dnsArray : undefined,
+      includeInStats: formData.includeInStats,
     });
 
     // Reset form
@@ -56,6 +61,7 @@ export const AddRangeDialog = ({ onAddRange }: AddRangeDialogProps) => {
       description: '',
       gateway: '',
       dnsServers: '',
+      includeInStats: true,
     });
     setIsOpen(false);
   };
@@ -63,14 +69,14 @@ export const AddRangeDialog = ({ onAddRange }: AddRangeDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-primary">
+        <Button className="button-primary text-white font-semibold">
           <Plus className="h-4 w-4 mr-2" />
           Add IP Range
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add New IP Range</DialogTitle>
+      <DialogContent className="sm:max-w-md card-modern shadow-elevated">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl font-semibold">Add New IP Range</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -154,11 +160,28 @@ export const AddRangeDialog = ({ onAddRange }: AddRangeDialogProps) => {
             />
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+          <div className="flex items-start space-x-3 p-3 bg-muted/30 rounded-lg border">
+            <Checkbox
+              id="includeInStats"
+              checked={formData.includeInStats}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, includeInStats: !!checked }))}
+              className="mt-0.5"
+            />
+            <div className="space-y-1">
+              <Label htmlFor="includeInStats" className="text-sm font-medium cursor-pointer">
+                Include in Statistics
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Include this range in global statistics calculations on the dashboard overview
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} className="button-modern">
               Cancel
             </Button>
-            <Button type="submit">Add Range</Button>
+            <Button type="submit" className="button-primary text-white font-semibold">Add Range</Button>
           </div>
         </form>
       </DialogContent>

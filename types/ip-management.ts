@@ -7,6 +7,8 @@ export interface IPRange {
   description?: string;
   gateway?: string;
   dnsServers?: string[];
+  includeInStats?: boolean;
+  label?: string;
   created: Date;
   updated: Date;
 }

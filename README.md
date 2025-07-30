@@ -1,73 +1,120 @@
-# Welcome to your Lovable project
+# IP Atlas - Network IP Range Manager
 
-## Project info
+A modern Next.js application for managing network IP ranges and allocations.
 
-**URL**: https://lovable.dev/projects/d116e8e0-294c-4950-927d-95ed91260f40
+## Features
 
-## How can I edit this code?
+- 🔐 **Secure Authentication** - Login system with NextAuth.js
+- 🗄️ **Database Integration** - SQLite database with Prisma ORM
+- 📊 **IP Range Management** - Create, view, and manage IP ranges
+- 🏷️ **IP Address Tracking** - Track IP status, assignments, and details
+- 🔍 **Bulk Operations** - Update multiple IP addresses at once
+- 📡 **REST API** - Full API for programmatic access
+- 📖 **API Documentation** - Interactive API documentation page
+- 🎨 **Modern UI** - Built with shadcn/ui and Tailwind CSS
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d116e8e0-294c-4950-927d-95ed91260f40) and start prompting.
+- Node.js 18+ 
+- npm
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Update the values in `.env.local` as needed.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+4. Initialize the database:
+   ```bash
+   npm run db:push
+   npm run db:generate
+   ```
 
-Follow these steps:
+5. Seed with sample data (optional):
+   ```bash
+   npm run db:seed
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+6. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Admin Account
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+After running the seed script, an admin account will be created. Contact the system administrator for login credentials.
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/signin` - Sign in (NextAuth.js)
+- `POST /api/auth/signout` - Sign out (NextAuth.js)
+
+### IP Ranges
+- `GET /api/ip-ranges` - Get all IP ranges
+- `POST /api/ip-ranges` - Create new IP range
+- `GET /api/ip-ranges/[id]` - Get specific IP range
+- `PATCH /api/ip-ranges/[id]` - Update IP range configuration
+- `DELETE /api/ip-ranges/[id]` - Delete IP range
+
+### IP Addresses
+- `PATCH /api/ip-addresses/[id]` - Update IP address
+- `PATCH /api/ip-addresses/bulk-update` - Bulk update IP addresses
+
+### User Management
+- `GET /api/user/api-key` - Get current user's API key
+- `POST /api/user/api-key` - Generate new API key
+- `DELETE /api/user/api-key` - Revoke API key
+
+Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) for full API documentation.
+
+## Database Commands
+
+- `npm run db:push` - Push schema changes to database
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:studio` - Open Prisma Studio
+- `npm run db:seed` - Seed database with sample data
+
+## Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+## Project Structure
+
+```
+├── app/                  # Next.js 13+ app directory
+│   ├── auth/            # Authentication pages
+│   ├── dashboard/       # Main dashboard
+│   └── layout.tsx       # Root layout
+├── components/          # Reusable UI components
+├── lib/                 # Utility libraries
+├── pages/api/           # API routes
+├── prisma/              # Database schema and migrations
+├── types/               # TypeScript type definitions
+└── utils/               # Utility functions
 ```
 
-**Edit a file directly in GitHub**
+## Technology Stack
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/d116e8e0-294c-4950-927d-95ed91260f40) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **Framework**: Next.js 15
+- **Authentication**: NextAuth.js
+- **Database**: SQLite with Prisma ORM
+- **UI Components**: shadcn/ui
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
+- **State Management**: React Query
