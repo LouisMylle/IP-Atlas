@@ -181,13 +181,6 @@ Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) for full 
    # NextAuth
    NEXTAUTH_URL="https://your-domain.com"
    NEXTAUTH_SECRET="generate-a-secure-random-string"
-   
-   # Optional: Email configuration for password resets
-   EMAIL_SERVER_HOST="smtp.your-email-provider.com"
-   EMAIL_SERVER_PORT="587"
-   EMAIL_SERVER_USER="your-email@domain.com"
-   EMAIL_SERVER_PASSWORD="your-email-password"
-   EMAIL_FROM="noreply@your-domain.com"
    ```
 
 3. **Update Prisma schema for production database** (if not using SQLite):
