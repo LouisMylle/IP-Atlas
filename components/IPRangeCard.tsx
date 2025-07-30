@@ -1,9 +1,12 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Network, Eye, EyeOff, Wifi, Trash2, BarChart3, Edit } from "lucide-react";
-import { IPRangeWithAddresses } from "@/types/ip-management";
-import { EditRangeDialog } from "@/components/EditRangeDialog";
+import { IPRangeWithAddresses } from "../types/ip-management";
+import { EditRangeDialog } from "./EditRangeDialog";
+import { getLabelStyle } from "../utils/label-utils";
 
 interface IPRangeCardProps {
   range: IPRangeWithAddresses;
@@ -17,43 +20,48 @@ interface IPRangeCardProps {
 
 export const IPRangeCard = ({ range, onViewDetails, onToggleVisibility, onToggleStats, onUpdateRange, onRemove, isHidden = false }: IPRangeCardProps) => {
   const utilizationPercentage = Math.round((range.usedIps / range.totalIps) * 100);
+  const labelStyle = getLabelStyle(range.label);
+  const LabelIcon = labelStyle.icon;
   
   const getUtilizationColor = (percentage: number) => {
-    if (percentage < 50) return "bg-ip-available";
-    if (percentage < 80) return "bg-ip-reserved";
-    return "bg-ip-used";
+    if (percentage >= 90) return "bg-red-500";
+    if (percentage >= 75) return "bg-orange-500";
+    if (percentage >= 50) return "bg-yellow-500";
+    return "bg-green-500";
   };
 
   return (
-    <Card className={`card-modern shadow-elevated ${isHidden ? 'opacity-60' : ''}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Network className="h-5 w-5 text-primary" />
-            {range.name}
-            {isHidden && <span className="text-sm text-muted-foreground">(Hidden)</span>}
-            {range.includeInStats === false && (
-              <Badge variant="outline" className="text-xs">
-                Excluded from stats
+    <>
+      <Card className={`border-border/20 shadow-elevated !bg-white hover:shadow-xl hover:border-border/40 transition-all duration-200 ${isHidden ? 'opacity-60' : ''}`}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Network className="h-5 w-5 text-primary" />
+              {range.name}
+              {isHidden && <span className="text-sm text-muted-foreground">(Hidden)</span>}
+              {range.includeInStats === false && (
+                <Badge variant="outline" className="text-xs">
+                  Excluded from stats
+                </Badge>
+              )}
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Badge className={`text-xs ${labelStyle.className}`}>
+                <LabelIcon className="h-3 w-3 mr-1" />
+                {labelStyle.displayText}
               </Badge>
-            )}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs capitalize">
-              {range.label || 'public'}
-            </Badge>
-            {range.vlan && range.vlan > 0 && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Wifi className="h-3 w-3" />
-                VLAN {range.vlan}
-              </Badge>
-            )}
+              {range.vlan && range.vlan > 0 && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Wifi className="h-3 w-3" />
+                  VLAN {range.vlan}
+                </Badge>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="text-sm text-muted-foreground">
-          {range.network}/{range.cidr}
-        </div>
-      </CardHeader>
+          <div className="text-sm text-muted-foreground">
+            {range.network}/{range.cidr}
+          </div>
+        </CardHeader>
       
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -116,18 +124,20 @@ export const IPRangeCard = ({ range, onViewDetails, onToggleVisibility, onToggle
               <EyeOff className="h-4 w-4" />
             )}
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => {
-              console.log('Edit button clicked for:', range.name);
-              console.log('onUpdateRange exists:', !!onUpdateRange);
-            }}
-            className="button-modern hover:bg-primary/10 hover:text-primary hover:border-primary/20"
-            title="Edit range"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
+          <EditRangeDialog
+            range={range}
+            onUpdateRange={onUpdateRange}
+            trigger={
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="button-modern hover:bg-primary/10 hover:text-primary hover:border-primary/20"
+                title="Edit range"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            }
+          />
           <Button 
             variant="outline" 
             size="sm" 
@@ -148,6 +158,7 @@ export const IPRangeCard = ({ range, onViewDetails, onToggleVisibility, onToggle
           </Button>
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </>
   );
 };

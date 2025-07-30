@@ -1,10 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { SessionProvider } from 'next-auth/react'
-import { Toaster } from '@/components/ui/toaster'
-import { Toaster as Sonner } from '@/components/ui/sonner'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryProvider } from './providers'
 
 export const metadata: Metadata = {
@@ -21,11 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ReactQueryProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            {children}
-          </TooltipProvider>
+          {children}
         </ReactQueryProvider>
       </body>
     </html>

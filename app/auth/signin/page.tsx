@@ -55,8 +55,8 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
-      <Card className="w-full max-w-md shadow-technical border-0">
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+      <Card className="w-full max-w-md shadow-lg border border-slate-200 bg-white">
         <CardHeader className="text-center space-y-4">
           <div className="flex items-center justify-center">
             <div className="p-3 rounded-full bg-primary/10">

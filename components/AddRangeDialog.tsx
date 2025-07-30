@@ -74,7 +74,7 @@ export const AddRangeDialog = ({ onAddRange }: AddRangeDialogProps) => {
           Add IP Range
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md card-modern shadow-elevated">
+      <DialogContent className="sm:max-w-md bg-white shadow-elevated">
         <DialogHeader className="pb-4">
           <DialogTitle className="text-xl font-semibold">Add New IP Range</DialogTitle>
         </DialogHeader>

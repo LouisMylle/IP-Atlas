@@ -44,7 +44,7 @@ const APIDocsPage = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-slate-100">
       <div className="container mx-auto py-6 space-y-6">
         <div className="space-y-4">
           <Link href="/dashboard">
@@ -68,7 +68,7 @@ const APIDocsPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-slate-50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Base URL</CardTitle>
               <Server className="h-4 w-4" />
@@ -78,7 +78,7 @@ const APIDocsPage = () => {
             </CardContent>
           </Card>
           
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-slate-50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Authentication</CardTitle>
               <Shield className="h-4 w-4" />
@@ -88,7 +88,7 @@ const APIDocsPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-slate-50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Format</CardTitle>
               <Database className="h-4 w-4" />
@@ -109,7 +109,7 @@ const APIDocsPage = () => {
           </TabsList>
 
           <TabsContent value="authentication" className="space-y-4">
-            <Card className="shadow-card">
+            <Card className="shadow-card bg-slate-50">
               <CardHeader>
                 <CardTitle>API Key Authentication</CardTitle>
               </CardHeader>
@@ -149,7 +149,7 @@ const APIDocsPage = () => {
           </TabsContent>
 
           <TabsContent value="ip-ranges" className="space-y-4">
-            <Card className="shadow-card">
+            <Card className="shadow-card bg-slate-50">
               <CardHeader>
                 <CardTitle>IP Range Management</CardTitle>
               </CardHeader>
@@ -240,7 +240,7 @@ const APIDocsPage = () => {
           </TabsContent>
 
           <TabsContent value="ip-addresses" className="space-y-4">
-            <Card className="shadow-card">
+            <Card className="shadow-card bg-slate-50">
               <CardHeader>
                 <CardTitle>IP Address Management</CardTitle>
               </CardHeader>
@@ -287,7 +287,7 @@ const APIDocsPage = () => {
           </TabsContent>
 
           <TabsContent value="user" className="space-y-4">
-            <Card className="shadow-card">
+            <Card className="shadow-card bg-slate-50">
               <CardHeader>
                 <CardTitle>User Management</CardTitle>
               </CardHeader>
@@ -341,7 +341,7 @@ const APIDocsPage = () => {
           </TabsContent>
 
           <TabsContent value="examples" className="space-y-4">
-            <Card className="shadow-card">
+            <Card className="shadow-card bg-slate-50">
               <CardHeader>
                 <CardTitle>Usage Examples</CardTitle>
               </CardHeader>
@@ -432,7 +432,7 @@ curl -X POST http://localhost:3000/api/user/api-key \\
           </TabsContent>
         </Tabs>
 
-        <Card className="shadow-card">
+        <Card className="shadow-card bg-slate-50">
           <CardHeader>
             <CardTitle>Response Codes</CardTitle>
           </CardHeader>

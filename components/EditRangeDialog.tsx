@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,8 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Edit } from "lucide-react";
-import { IPRangeWithAddresses } from "@/types/ip-management";
-import { getLabelStyle } from "@/utils/label-utils";
+import { IPRangeWithAddresses } from "../types/ip-management";
+import { getLabelStyle } from "../utils/label-utils";
 
 interface EditRangeDialogProps {
   range: IPRangeWithAddresses;
@@ -34,10 +36,6 @@ export const EditRangeDialog = ({ range, onUpdateRange, trigger }: EditRangeDial
     customLabel: '',
   });
 
-  // Get preview label style based on current form data
-  const previewLabel = formData.label === 'custom' ? formData.customLabel : formData.label;
-  const previewLabelStyle = getLabelStyle(previewLabel);
-  const PreviewLabelIcon = previewLabelStyle.icon;
 
   // Initialize form data when range changes or dialog opens
   useEffect(() => {
@@ -133,19 +131,19 @@ export const EditRangeDialog = ({ range, onUpdateRange, trigger }: EditRangeDial
                 <SelectContent>
                   <SelectItem value="public">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <div className="w-3 h-3 rounded bg-green-500"></div>
                       Public
                     </div>
                   </SelectItem>
                   <SelectItem value="private">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                      <div className="w-3 h-3 rounded bg-orange-500"></div>
                       Private
                     </div>
                   </SelectItem>
                   <SelectItem value="custom">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                      <div className="w-3 h-3 rounded bg-purple-500"></div>
                       Custom
                     </div>
                   </SelectItem>
@@ -154,16 +152,6 @@ export const EditRangeDialog = ({ range, onUpdateRange, trigger }: EditRangeDial
             </div>
           </div>
 
-          {/* Label Preview */}
-          <div className="bg-muted/30 p-3 rounded-lg border">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-muted-foreground">Label Preview:</div>
-              <div className={previewLabelStyle.className}>
-                <PreviewLabelIcon className="h-3 w-3" />
-                {previewLabelStyle.displayText}
-              </div>
-            </div>
-          </div>
 
           {formData.label === 'custom' && (
             <div>

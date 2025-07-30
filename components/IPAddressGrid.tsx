@@ -22,8 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IPAddress, IPRangeWithAddresses } from "@/types/ip-management";
-import { BulkActionsToolbar } from "@/components/BulkActionsToolbar";
+import { IPAddress, IPRangeWithAddresses } from "../types/ip-management";
+import { BulkActionsToolbar } from "./BulkActionsToolbar";
 import { Edit, Filter, Search, CheckSquare, Square } from "lucide-react";
 
 interface IPAddressGridProps {
@@ -87,6 +87,24 @@ export const IPAddressGrid = ({ range, onUpdateIP, onBulkUpdateIPs }: IPAddressG
     setSelectedIPs([]);
   };
 
+  const handleSelectFirst = (count: number) => {
+    const firstIPs = filteredAddresses.slice(0, count).map(ip => ip.id);
+    setSelectedIPs(firstIPs);
+  };
+
+  const handleSelectLast = (count: number) => {
+    const lastIPs = filteredAddresses.slice(-count).map(ip => ip.id);
+    setSelectedIPs(lastIPs);
+  };
+
+  const handleSelectRange = (start: number, end: number) => {
+    // Convert to 0-based indexing
+    const startIndex = Math.max(0, start - 1);
+    const endIndex = Math.min(filteredAddresses.length, end);
+    const rangeIPs = filteredAddresses.slice(startIndex, endIndex).map(ip => ip.id);
+    setSelectedIPs(rangeIPs);
+  };
+
   const selectedIPObjects = filteredAddresses.filter(ip => selectedIPs.includes(ip.id));
 
   return (
@@ -97,10 +115,13 @@ export const IPAddressGrid = ({ range, onUpdateIP, onBulkUpdateIPs }: IPAddressG
         onBulkClear={handleDeselectAll}
         onSelectAll={handleSelectAll}
         onDeselectAll={handleDeselectAll}
+        onSelectFirst={handleSelectFirst}
+        onSelectLast={handleSelectLast}
+        onSelectRange={handleSelectRange}
         totalIPs={filteredAddresses.length}
       />
       
-      <Card>
+      <Card className="bg-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>IP Addresses - {range.name}</span>
@@ -142,7 +163,17 @@ export const IPAddressGrid = ({ range, onUpdateIP, onBulkUpdateIPs }: IPAddressG
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredAddresses.map((ip) => (
-              <Card key={ip.id} className="hover:shadow-sm transition-shadow relative">
+              <Card 
+                key={ip.id} 
+                className="hover:shadow-sm transition-shadow relative cursor-pointer bg-white" 
+                onClick={(e) => {
+                  // Don't trigger selection if clicking on buttons or checkboxes
+                  if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('[role="checkbox"]')) {
+                    return;
+                  }
+                  handleIPSelection(ip.id, !selectedIPs.includes(ip.id));
+                }}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">

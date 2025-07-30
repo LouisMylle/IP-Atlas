@@ -1,11 +1,11 @@
 import NextAuth from 'next-auth'
 import type { NextAuthOptions } from 'next-auth'
-import Credentials from 'next-auth/providers/credentials'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import { getUserByEmail, verifyPassword } from '../../../lib/auth'
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },

@@ -2,16 +2,40 @@
 
 A modern Next.js application for managing network IP ranges and allocations.
 
+## Table of Contents
+
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Default Login Credentials](#default-login-credentials)
+  - [First Steps After Login](#first-steps-after-login)
+- [API Endpoints](#api-endpoints)
+- [Database Commands](#database-commands)
+- [Scripts](#scripts)
+- [Project Structure](#project-structure)
+- [Technology Stack](#technology-stack)
+- [Production Deployment](#production-deployment)
+
 ## Features
 
-- 🔐 **Secure Authentication** - Login system with NextAuth.js
+- 🔐 **Secure Authentication** - Login system with NextAuth.js and session management
 - 🗄️ **Database Integration** - SQLite database with Prisma ORM
-- 📊 **IP Range Management** - Create, view, and manage IP ranges
-- 🏷️ **IP Address Tracking** - Track IP status, assignments, and details
-- 🔍 **Bulk Operations** - Update multiple IP addresses at once
-- 📡 **REST API** - Full API for programmatic access
+- 📊 **IP Range Management** - Create, view, edit, and delete IP ranges with CIDR notation
+- 🏷️ **IP Address Tracking** - Track IP status, assignments, hostname, MAC addresses, and last seen
+- 🔍 **Bulk Operations** - Update multiple IP addresses at once with status changes
+- 📡 **REST API** - Full API for programmatic access with API key authentication
 - 📖 **API Documentation** - Interactive API documentation page
 - 🎨 **Modern UI** - Built with shadcn/ui and Tailwind CSS
+- 🏗️ **VLAN Support** - Organize IP ranges by VLAN ID for network segmentation
+- 🌐 **DNS Management** - Configure multiple DNS servers per IP range
+- 🚪 **Gateway Configuration** - Set default gateways for each network range
+- 🔄 **Status Management** - Track IP states: available, used, reserved, offline
+- 📈 **Statistics Dashboard** - Overview of IP usage and allocation with filtering options
+- 🔧 **User Settings** - Profile management, password changes, and API key generation
+- 🏷️ **Range Labels** - Categorize ranges as public, private, or custom labels
+- 👁️ **Range Visibility** - Hide/show ranges from statistics and main view
+- 📋 **IP Assignment Tracking** - Track who IP addresses are assigned to
 
 ## Getting Started
 
@@ -40,7 +64,7 @@ A modern Next.js application for managing network IP ranges and allocations.
    npm run db:generate
    ```
 
-5. Seed with sample data (optional):
+5. Seed the database with starter admin user:
    ```bash
    npm run db:seed
    ```
@@ -52,9 +76,20 @@ A modern Next.js application for managing network IP ranges and allocations.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-### Admin Account
+### Default Login Credentials
 
-After running the seed script, an admin account will be created. Contact the system administrator for login credentials.
+After running the seed script, you can log in with:
+
+- **Email**: `admin@ipatlas.local`
+- **Password**: `admin123`
+
+⚠️ **IMPORTANT**: Change these default credentials immediately after your first login!
+
+### First Steps After Login
+
+1. Navigate to Settings and change your password
+2. Generate a new API key if needed for API access
+3. Start creating your IP ranges and managing your network
 
 ## API Endpoints
 
@@ -118,3 +153,89 @@ Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) for full 
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
 - **State Management**: React Query
+
+## Production Deployment
+
+### Prerequisites for Production
+
+- Node.js 18+ on your production server
+- A production database (PostgreSQL, MySQL, or SQLite)
+- Environment variables properly configured
+- SSL certificate for HTTPS (recommended)
+
+### Production Setup
+
+1. **Clone and prepare the application**:
+   ```bash
+   git clone <repository-url>
+   cd ip-atlas
+   npm install --production
+   ```
+
+2. **Configure production environment variables**:
+   Create a `.env.production` file with:
+   ```env
+   # Database
+   DATABASE_URL="your-production-database-url"
+   
+   # NextAuth
+   NEXTAUTH_URL="https://your-domain.com"
+   NEXTAUTH_SECRET="generate-a-secure-random-string"
+   
+   # Optional: Email configuration for password resets
+   EMAIL_SERVER_HOST="smtp.your-email-provider.com"
+   EMAIL_SERVER_PORT="587"
+   EMAIL_SERVER_USER="your-email@domain.com"
+   EMAIL_SERVER_PASSWORD="your-email-password"
+   EMAIL_FROM="noreply@your-domain.com"
+   ```
+
+3. **Update Prisma schema for production database** (if not using SQLite):
+   Edit `prisma/schema.prisma` to match your production database:
+   ```prisma
+   datasource db {
+     provider = "postgresql" // or "mysql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+
+4. **Run database migrations**:
+   ```bash
+   npm run db:push
+   npm run db:generate
+   ```
+
+5. **Build the application**:
+   ```bash
+   npm run build
+   ```
+
+6. **Seed initial admin user** (optional):
+   ```bash
+   npm run db:seed
+   ```
+
+7. **Start the production server**:
+   ```bash
+   npm run start
+   ```
+   The application will run on port 3000 by default.
+
+### Deployment with PM2
+
+1. Install PM2 globally:
+   ```bash
+   npm install -g pm2
+   ```
+
+2. Start the application:
+   ```bash
+   pm2 start npm --name "ip-atlas" -- start
+   ```
+
+3. Save PM2 configuration:
+   ```bash
+   pm2 save
+   pm2 startup
+   ```
+

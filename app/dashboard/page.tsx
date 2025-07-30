@@ -4,13 +4,15 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { IPRangeCard } from "../../components/IPRangeCard"
 import { IPAddressGrid } from "../../components/IPAddressGrid"
 import { AddRangeDialog } from "../../components/AddRangeDialog"
-import { IPRange, IPAddress, IPRangeWithAddresses } from "@/types/ip-management"
+import { IPRange, IPAddress, IPRangeWithAddresses } from "../../types/ip-management"
 import { ArrowLeft, Network, Server, Activity, EyeOff, Code, LogOut, Settings, Wifi } from "lucide-react"
-import { getLabelStyle } from "@/utils/label-utils"
-import { useToast } from "@/hooks/use-toast"
+import { getLabelStyle } from "../../utils/label-utils"
+import { useToast } from "../../hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
@@ -20,6 +22,8 @@ const Dashboard = () => {
   const [selectedRange, setSelectedRange] = useState<IPRangeWithAddresses | null>(null)
   const [hiddenRanges, setHiddenRanges] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
+  const [includeReservedInUsed, setIncludeReservedInUsed] = useState(true)
+  const [includeReservedInAvailable, setIncludeReservedInAvailable] = useState(false)
   const { toast } = useToast()
 
   // Fetch IP ranges from API
@@ -352,7 +356,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     )
@@ -363,15 +367,27 @@ const Dashboard = () => {
 
   const statsRanges = ranges.filter(range => range.includeInStats !== false)
   const totalIPs = statsRanges.reduce((sum, range) => sum + range.totalIps, 0)
-  const totalUsed = statsRanges.reduce((sum, range) => sum + range.usedIps, 0)
-  const totalAvailable = statsRanges.reduce((sum, range) => sum + range.availableIps, 0)
+  const totalUsed = statsRanges.reduce((sum, range) => {
+    const usedCount = range.usedIps
+    const reservedCount = includeReservedInUsed 
+      ? range.addresses.filter(ip => ip.status === 'reserved').length 
+      : 0
+    return sum + usedCount + reservedCount
+  }, 0)
+  const totalAvailable = statsRanges.reduce((sum, range) => {
+    const availableCount = range.availableIps
+    const reservedCount = includeReservedInAvailable 
+      ? range.addresses.filter(ip => ip.status === 'reserved').length 
+      : 0
+    return sum + availableCount + reservedCount
+  }, 0)
 
   if (selectedRange) {
     const selectedLabelStyle = getLabelStyle(selectedRange.label);
     const SelectedLabelIcon = selectedLabelStyle.icon;
     
     return (
-      <div className="min-h-screen bg-gradient-subtle">
+      <div className="min-h-screen bg-slate-100">
         <div className="container mx-auto py-6 space-y-6">
           <div className="space-y-4">
             <Button 
@@ -387,10 +403,10 @@ const Dashboard = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <h1 className="text-3xl font-bold">{selectedRange.name}</h1>
-                  <div className={selectedLabelStyle.className}>
-                    <SelectedLabelIcon className="h-4 w-4" />
+                  <Badge className={selectedLabelStyle.className}>
+                    <SelectedLabelIcon className="h-4 w-4 mr-1" />
                     {selectedLabelStyle.displayText}
-                  </div>
+                  </Badge>
                   {selectedRange.vlan && selectedRange.vlan > 0 && (
                     <Badge variant="secondary" className="flex items-center gap-1">
                       <Wifi className="h-4 w-4" />
@@ -439,7 +455,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-slate-100">
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex items-start justify-between">
           <div className="space-y-3">
@@ -477,7 +493,7 @@ const Dashboard = () => {
 
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="card-modern shadow-elevated border-l-4 border-l-primary">
+          <Card className="shadow-elevated border-l-4 border-l-primary !bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Ranges</CardTitle>
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -490,7 +506,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="card-modern shadow-elevated border-l-4 border-l-slate-500">
+          <Card className="shadow-elevated border-l-4 border-l-slate-500 !bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total IPs</CardTitle>
               <div className="p-2 bg-slate-100 rounded-lg">
@@ -503,7 +519,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="card-modern shadow-elevated border-l-4 border-l-blue-500">
+          <Card className="shadow-elevated border-l-4 border-l-blue-500 !bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Used IPs</CardTitle>
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -515,10 +531,20 @@ const Dashboard = () => {
               <p className="text-xs text-muted-foreground">
                 {totalIPs > 0 ? Math.round((totalUsed / totalIPs) * 100) : 0}% utilization
               </p>
+              <div className="flex items-center space-x-2 mt-3 pt-2 border-t">
+                <Switch
+                  id="include-reserved"
+                  checked={includeReservedInUsed}
+                  onCheckedChange={setIncludeReservedInUsed}
+                />
+                <Label htmlFor="include-reserved" className="text-xs text-muted-foreground">
+                  Include reserved in used
+                </Label>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="card-modern shadow-elevated border-l-4 border-l-green-500">
+          <Card className="shadow-elevated border-l-4 border-l-green-500 !bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">Available IPs</CardTitle>
               <div className="p-2 bg-green-100 rounded-lg">
@@ -530,37 +556,49 @@ const Dashboard = () => {
               <p className="text-xs text-muted-foreground mt-1">
                 {totalIPs > 0 ? Math.round((totalAvailable / totalIPs) * 100) : 0}% available
               </p>
+              <div className="flex items-center space-x-2 mt-3 pt-2 border-t">
+                <Switch
+                  id="include-reserved-available"
+                  checked={includeReservedInAvailable}
+                  onCheckedChange={setIncludeReservedInAvailable}
+                />
+                <Label htmlFor="include-reserved-available" className="text-xs text-muted-foreground">
+                  Include reserved in available
+                </Label>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* IP Ranges Tabs */}
         <Tabs defaultValue="visible" className="space-y-6">
-          <TabsList className="shadow-sm bg-muted/50">
-            <TabsTrigger value="visible" className="data-[state=active]:shadow-sm">
+          <TabsList>
+            <TabsTrigger value="visible">
               Visible Ranges ({visibleRanges.length})
             </TabsTrigger>
-            <TabsTrigger value="hidden" className="data-[state=active]:shadow-sm">
+            <TabsTrigger value="hidden">
               Hidden Ranges ({hiddenRangesList.length})
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="visible" className="space-y-4">
             {visibleRanges.length > 0 ? (
-              visibleRanges.map((range) => (
-                <IPRangeCard
-                  key={range.id}
-                  range={range}
-                  onViewDetails={setSelectedRange}
-                  onToggleVisibility={handleToggleVisibility}
-                  onToggleStats={handleToggleStats}
-                  onUpdateRange={handleUpdateRange}
-                  onRemove={handleRemoveRange}
-                  isHidden={false}
-                />
-              ))
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {visibleRanges.map((range) => (
+                  <IPRangeCard
+                    key={range.id}
+                    range={range}
+                    onViewDetails={setSelectedRange}
+                    onToggleVisibility={handleToggleVisibility}
+                    onToggleStats={handleToggleStats}
+                    onUpdateRange={handleUpdateRange}
+                    onRemove={handleRemoveRange}
+                    isHidden={false}
+                  />
+                ))}
+              </div>
             ) : (
-              <Card className="shadow-card">
+              <Card className="shadow-card bg-white">
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Network className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
@@ -580,20 +618,22 @@ const Dashboard = () => {
           
           <TabsContent value="hidden" className="space-y-4">
             {hiddenRangesList.length > 0 ? (
-              hiddenRangesList.map((range) => (
-                <IPRangeCard
-                  key={range.id}
-                  range={range}
-                  onViewDetails={setSelectedRange}
-                  onToggleVisibility={handleToggleVisibility}
-                  onToggleStats={handleToggleStats}
-                  onUpdateRange={handleUpdateRange}
-                  onRemove={handleRemoveRange}
-                  isHidden={true}
-                />
-              ))
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {hiddenRangesList.map((range) => (
+                  <IPRangeCard
+                    key={range.id}
+                    range={range}
+                    onViewDetails={setSelectedRange}
+                    onToggleVisibility={handleToggleVisibility}
+                    onToggleStats={handleToggleStats}
+                    onUpdateRange={handleUpdateRange}
+                    onRemove={handleRemoveRange}
+                    isHidden={true}
+                  />
+                ))}
+              </div>
             ) : (
-              <Card className="shadow-card">
+              <Card className="shadow-card bg-white">
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <EyeOff className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No Hidden Ranges</h3>

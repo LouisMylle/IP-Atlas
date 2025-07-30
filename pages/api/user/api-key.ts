@@ -25,10 +25,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const newApiKey = generateApiKey()
       
-      await prisma.user.update({
+      // First check if user exists, if not create it
+      const existingUser = await prisma.user.findUnique({
         where: { id: user.id },
-        data: { apiKey: newApiKey },
       })
+      
+      if (!existingUser) {
+        // Create user if it doesn't exist
+        await prisma.user.create({
+          data: {
+            id: user.id,
+            email: user.email || '',
+            name: user.name || '',
+            password: '', // Required field, but empty for OAuth users
+            apiKey: newApiKey,
+          },
+        })
+      } else {
+        // Update existing user
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { apiKey: newApiKey },
+        })
+      }
 
       res.status(201).json({ apiKey: newApiKey })
     } catch (error) {
@@ -37,10 +56,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } else if (req.method === 'DELETE') {
     try {
-      await prisma.user.update({
+      // Check if user exists first
+      const existingUser = await prisma.user.findUnique({
         where: { id: user.id },
-        data: { apiKey: null },
       })
+      
+      if (existingUser) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { apiKey: null },
+        })
+      }
 
       res.status(200).json({ message: 'API key revoked successfully' })
     } catch (error) {

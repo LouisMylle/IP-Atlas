@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '../../hooks/use-toast'
 import { ArrowLeft, User, Lock, Save, Key, Copy, RefreshCw, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -141,7 +141,7 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-slate-100">
       <div className="container mx-auto py-6 space-y-6">
         <div className="space-y-4">
           <Link href="/dashboard">
@@ -161,7 +161,7 @@ const SettingsPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* API Key Management */}
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-slate-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Key className="h-5 w-5" />
@@ -249,7 +249,7 @@ const SettingsPage = () => {
           </Card>
 
           {/* Profile Settings */}
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-slate-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -294,7 +294,7 @@ const SettingsPage = () => {
           </Card>
 
           {/* Password Settings */}
-          <Card className="shadow-card">
+          <Card className="shadow-card bg-slate-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5" />
@@ -357,7 +357,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Account Info */}
-        <Card className="shadow-card">
+        <Card className="shadow-card bg-slate-50">
           <CardHeader>
             <CardTitle>Account Information</CardTitle>
           </CardHeader>
